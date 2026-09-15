@@ -32,7 +32,7 @@ function Login() {
         console.log("Login successful:", result);
         Cookies.set("token", result.token);
         localStorage.setItem("userName", user.userName);
-        navigate("/posts");
+        navigate("/");
         window.location.reload();
       } else {
         console.error("Login failed:", result);
