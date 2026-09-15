@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 const PostCard = ({ post, currentUser, showActions }) => {
   const token = Cookies.get("token");
   const userName = localStorage.getItem("userName");
+
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likedByProfiles.length);
 
@@ -20,9 +21,10 @@ const PostCard = ({ post, currentUser, showActions }) => {
   useEffect(() => {
     const fetchLikeStatus = async () => {
       if (!currentUser) return;
+
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/post/isLiked/'${post.postId}/${currentUser}`,
+          `${import.meta.env.VITE_API_URL}/post/isLiked/${post.postId}/${currentUser}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -30,6 +32,7 @@ const PostCard = ({ post, currentUser, showActions }) => {
             },
           }
         );
+
         const text = await response.text();
         setLiked(text ? JSON.parse(text) : false);
       } catch (error) {
@@ -45,7 +48,7 @@ const PostCard = ({ post, currentUser, showActions }) => {
     const fetchComments = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/comment/post/${post.postId}`,
+          `${import.meta.env.VITE_API_URL}/comment/post/${post.postId}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -53,6 +56,7 @@ const PostCard = ({ post, currentUser, showActions }) => {
             },
           }
         );
+
         const data = await response.json();
         console.log(data);
 
@@ -70,10 +74,12 @@ const PostCard = ({ post, currentUser, showActions }) => {
       alert("Please log in to like posts.");
       return;
     }
+
     try {
       const url = liked
-        ? `http://localhost:8080/post/unlike/${post.postId}/${currentUser}`
-        : `http://localhost:8080/post/like/${post.postId}/${currentUser}`;
+        ? `${import.meta.env.VITE_API_URL}/post/unlike/${post.postId}/${currentUser}`
+        : `${import.meta.env.VITE_API_URL}/post/like/${post.postId}/${currentUser}`;
+
       const method = liked ? "DELETE" : "POST";
 
       const response = await fetch(url, {
@@ -99,7 +105,7 @@ const PostCard = ({ post, currentUser, showActions }) => {
     if (window.confirm("Are you sure you want to delete this post?")) {
       try {
         const response = await fetch(
-          `http://localhost:8080/post/delete/${post.postId}`,
+          `${import.meta.env.VITE_API_URL}/post/delete/${post.postId}`,
           {
             method: "DELETE",
             headers: {
@@ -107,6 +113,7 @@ const PostCard = ({ post, currentUser, showActions }) => {
             },
           }
         );
+
         if (response.ok) {
           alert("Post deleted successfully");
           window.location.reload();
@@ -132,11 +139,13 @@ const PostCard = ({ post, currentUser, showActions }) => {
   const handleSaveEdit = async () => {
     try {
       const formData = new FormData();
+
       formData.append("postTitle", editTitle);
       formData.append("postContent", editContent);
       formData.append("userName", userName);
+
       const response = await fetch(
-        `http://localhost:8080/post/update/${post.postId}`,
+        `${import.meta.env.VITE_API_URL}/post/update/${post.postId}`,
         {
           method: "PUT",
           headers: {
@@ -160,6 +169,7 @@ const PostCard = ({ post, currentUser, showActions }) => {
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
+
     try {
       const commentData = {
         content: newComment,
@@ -167,14 +177,17 @@ const PostCard = ({ post, currentUser, showActions }) => {
         post: { postId: post.postId },
       };
 
-      const response = await fetch(`http://localhost:8080/comment/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(commentData),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/comment/add`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(commentData),
+        }
+      );
 
       if (response.ok) {
         const newCommentData = await response.json();
@@ -192,7 +205,7 @@ const PostCard = ({ post, currentUser, showActions }) => {
     if (window.confirm("Delete this comment?")) {
       try {
         const response = await fetch(
-          `http://localhost:8080/comment/delete/${commentId}`,
+          `${import.meta.env.VITE_API_URL}/comment/delete/${commentId}`,
           {
             method: "DELETE",
             headers: {
@@ -202,7 +215,9 @@ const PostCard = ({ post, currentUser, showActions }) => {
         );
 
         if (response.ok) {
-          setComments((prev) => prev.filter((c) => c.commentId !== commentId));
+          setComments((prev) =>
+            prev.filter((c) => c.commentId !== commentId)
+          );
         } else {
           alert("Failed to delete comment");
         }
@@ -218,7 +233,13 @@ const PostCard = ({ post, currentUser, showActions }) => {
 
   return (
     <div className="card my-4 shadow-sm" style={{ width: "350px" }}>
-      <div style={{ width: "100%", paddingTop: "100%", position: "relative" }}>
+      <div
+        style={{
+          width: "100%",
+          paddingTop: "100%",
+          position: "relative",
+        }}
+      >
         <img
           src={post.publicPostUrl}
           className="card-img-top"
@@ -235,7 +256,9 @@ const PostCard = ({ post, currentUser, showActions }) => {
       </div>
 
       <div className="card-body">
-        <p className="card-text text-muted mb-2">{likeCount} likes</p>
+        <p className="card-text text-muted mb-2">
+          {likeCount} likes
+        </p>
 
         <div className="d-flex mb-3">
           <button
@@ -250,6 +273,7 @@ const PostCard = ({ post, currentUser, showActions }) => {
             />
             {liked ? "Liked" : "Like"}
           </button>
+
           <button className="btn btn-link text-primary d-flex align-items-center p-0 text-decoration-none">
             <MessageCircle size={18} className="me-1" />
             Comment
@@ -264,12 +288,14 @@ const PostCard = ({ post, currentUser, showActions }) => {
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
             />
+
             <textarea
               className="form-control mb-2"
               rows="3"
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
             />
+
             <div className="d-flex justify-content-between">
               <button
                 className="btn btn-sm btn-success"
@@ -277,6 +303,7 @@ const PostCard = ({ post, currentUser, showActions }) => {
               >
                 Save
               </button>
+
               <button
                 className="btn btn-sm btn-secondary"
                 onClick={handleCancelEdit}
@@ -290,13 +317,21 @@ const PostCard = ({ post, currentUser, showActions }) => {
             <h6 className="card-subtitle mb-2 text-dark">
               {post.user.username} - {post.postTitle}
             </h6>
-            <p className="card-text text-secondary">{post.postContent}</p>
+
+            <p className="card-text text-secondary">
+              {post.postContent}
+            </p>
           </>
         )}
 
         <div className="d-flex justify-content-between text-muted small mt-3">
-          <span>Created: {new Date(post.postCreation).toLocaleString()}</span>
-          <span>Updated: {new Date(post.postUpdation).toLocaleString()}</span>
+          <span>
+            Created: {new Date(post.postCreation).toLocaleString()}
+          </span>
+
+          <span>
+            Updated: {new Date(post.postUpdation).toLocaleString()}
+          </span>
         </div>
 
         {showActions && !isEditing && (
@@ -307,6 +342,7 @@ const PostCard = ({ post, currentUser, showActions }) => {
             >
               <Edit size={16} className="me-1" /> Edit
             </button>
+
             <button
               className="btn btn-sm btn-outline-danger d-flex align-items-center"
               onClick={handleDeletePost}
@@ -319,6 +355,7 @@ const PostCard = ({ post, currentUser, showActions }) => {
         {/* Comments Section */}
         <div className="mt-3">
           <h6 className="mb-2">Comments:</h6>
+
           {comments.slice(0, visibleComments).map((comment) => (
             <div
               key={comment.commentId}
@@ -328,10 +365,13 @@ const PostCard = ({ post, currentUser, showActions }) => {
                 <strong>{comment.user.username}:</strong>{" "}
                 <span>{comment.content}</span>
               </div>
+
               {comment.user.username === userName && (
                 <button
                   className="btn btn-sm btn-link text-danger p-0"
-                  onClick={() => handleDeleteComment(comment.commentId)}
+                  onClick={() =>
+                    handleDeleteComment(comment.commentId)
+                  }
                 >
                   <Trash size={14} />
                 </button>
@@ -357,6 +397,7 @@ const PostCard = ({ post, currentUser, showActions }) => {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
             />
+
             <button
               className="btn btn-sm btn-primary"
               onClick={handleAddComment}

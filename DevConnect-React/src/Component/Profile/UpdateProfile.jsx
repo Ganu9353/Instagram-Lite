@@ -22,8 +22,9 @@ function UpdateProfile() {
       try {
         const userName = localStorage.getItem("userName");
         const token = Cookies.get("token");
-        console.log("UserName ", userName);
-        console.log("Token ", token);
+
+        console.log("UserName:", userName);
+        console.log("Token:", token);
 
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/profile/user/${userName}`,
@@ -38,7 +39,9 @@ function UpdateProfile() {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("Profile Data ", data);
+
+          console.log("Profile Data:", data);
+
           setProfile({
             profileId: data.profileId || "",
             profileUserName: data.profileUserName || "",
@@ -61,27 +64,38 @@ function UpdateProfile() {
 
   const handleOnChange = (event) => {
     const { name, value, files } = event.target;
+
     if (name === "profilePhoto") {
       const file = files[0];
-      setProfile({ ...profile, [name]: file });
+
+      setProfile({
+        ...profile,
+        [name]: file,
+      });
+
       if (file) {
         setPreviewImage(URL.createObjectURL(file));
       } else {
         setPreviewImage(null);
       }
     } else {
-      setProfile({ ...profile, [name]: value });
+      setProfile({
+        ...profile,
+        [name]: value,
+      });
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     console.log("Profile submitted:", profile);
 
     const token = Cookies.get("token");
     const profileId = profile.profileId;
 
     const formData = new FormData();
+
     formData.append("profileId", profile.profileId);
     formData.append("profileUserName", profile.profileUserName);
     formData.append("profileBio", profile.profileBio);
@@ -94,7 +108,7 @@ function UpdateProfile() {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/profile/update/${profileId}`,
+        `${import.meta.env.VITE_API_URL}/profile/update/${profileId}`,
         {
           method: "PUT",
           headers: {
@@ -105,12 +119,15 @@ function UpdateProfile() {
       );
 
       if (response.ok) {
-        console.log("Data saved ", await response.json());
+        console.log("Data saved:", await response.json());
+        alert("Profile updated successfully");
       } else {
-        console.log("Data not saved ", await response.text());
+        console.log("Data not saved:", await response.text());
+        alert("Profile update failed");
       }
     } catch (error) {
-      console.error("Error in submitting ", error);
+      console.error("Error in submitting:", error);
+      alert("Something went wrong");
     }
   };
 
@@ -121,12 +138,17 @@ function UpdateProfile() {
           <div className="card shadow p-4">
             <div className="position-relative mb-4">
               <button
+                type="button"
                 className="btn btn-outline-primary position-absolute start-0"
-                style={{ top: "50%", transform: "translateY(-50%)" }}
+                style={{
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                }}
                 onClick={() => navigate("/posts")}
               >
                 Posts
               </button>
+
               <h2
                 className="text-center mx-auto"
                 style={{ width: "fit-content" }}
@@ -137,10 +159,15 @@ function UpdateProfile() {
 
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
-                <label htmlFor="profileUserName" className="form-label">
+                <label
+                  htmlFor="profileUserName"
+                  className="form-label"
+                >
                   Name
                 </label>
+
                 <input
+                  id="profileUserName"
                   name="profileUserName"
                   type="text"
                   className="form-control"
@@ -151,10 +178,15 @@ function UpdateProfile() {
               </div>
 
               <div className="mb-3">
-                <label htmlFor="profileBio" className="form-label">
+                <label
+                  htmlFor="profileBio"
+                  className="form-label"
+                >
                   Bio
                 </label>
+
                 <textarea
+                  id="profileBio"
                   name="profileBio"
                   className="form-control"
                   value={profile.profileBio}
@@ -164,10 +196,15 @@ function UpdateProfile() {
               </div>
 
               <div className="mb-3">
-                <label htmlFor="gitHubLink" className="form-label">
+                <label
+                  htmlFor="gitHubLink"
+                  className="form-label"
+                >
                   GitHub Link
                 </label>
+
                 <input
+                  id="gitHubLink"
                   name="gitHubLink"
                   type="url"
                   className="form-control"
@@ -177,10 +214,15 @@ function UpdateProfile() {
               </div>
 
               <div className="mb-3">
-                <label htmlFor="profilePhoto" className="form-label">
+                <label
+                  htmlFor="profilePhoto"
+                  className="form-label"
+                >
                   Profile Photo
                 </label>
+
                 <input
+                  id="profilePhoto"
                   name="profilePhoto"
                   type="file"
                   className="form-control"
@@ -201,7 +243,10 @@ function UpdateProfile() {
                 </div>
               )}
 
-              <button type="submit" className="btn btn-primary w-100">
+              <button
+                type="submit"
+                className="btn btn-primary w-100"
+              >
                 Save Profile
               </button>
             </form>
