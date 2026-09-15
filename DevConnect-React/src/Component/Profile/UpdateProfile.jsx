@@ -26,7 +26,7 @@ function UpdateProfile() {
         console.log("Token ", token);
 
         const response = await fetch(
-          `http://localhost:8080/profile/user/${userName}`,
+          `${import.meta.env.VITE_API_URL}/profile/user/${userName}`,
           {
             method: "GET",
             headers: {

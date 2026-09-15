@@ -40,7 +40,7 @@ function AddPost() {
     formData.append("userName", userName);
 
     try {
-      const response = await fetch("http://localhost:8080/post/add", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/post/add`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

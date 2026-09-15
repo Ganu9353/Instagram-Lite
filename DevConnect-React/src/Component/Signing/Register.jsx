@@ -21,7 +21,7 @@ function Register() {
 
     try {
       const responseSavedData = await fetch(
-        "http://localhost:8080/auth/register",
+        `${import.meta.env.VITE_API_URL}/auth/register`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

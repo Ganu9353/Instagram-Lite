@@ -12,7 +12,7 @@ function GetUserAllPost() {
     const fetchPosts = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/post/user/${userName}`,
+          `${import.meta.env.VITE_API_URL}/post/user/${userName}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

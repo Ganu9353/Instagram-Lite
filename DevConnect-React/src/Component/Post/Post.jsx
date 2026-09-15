@@ -8,7 +8,7 @@ function Post() {
   const userName = localStorage.getItem("userName");  
   useEffect(() => {
     const fetchPosts = async () => {
-      const response = await fetch("http://localhost:8080/post", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/post`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

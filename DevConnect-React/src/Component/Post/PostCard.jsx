@@ -22,7 +22,7 @@ const PostCard = ({ post, currentUser, showActions }) => {
       if (!currentUser) return;
       try {
         const response = await fetch(
-          `http://localhost:8080/post/isLiked/${post.postId}/${currentUser}`,
+          `${import.meta.env.VITE_API_URL}/post/isLiked/'${post.postId}/${currentUser}`,
           {
             headers: {
               "Content-Type": "application/json",
